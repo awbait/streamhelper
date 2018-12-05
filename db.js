@@ -10,23 +10,19 @@ const connection = new Pool({
     max: 20
 })
 connection.connect();
-/**
- * Получить пользователя по TwitchID
- * @param  {integer} id
- */
 
 async function getUserByTID(id) {
     try {
-        let res = await connection.query('SELECT * FROM users WHERE t_id = $1', [id]);
+        let res = await connection.query('SELECT * FROM users INNER JOIN points ON users.id = points.user_id WHERE users.t_id = $1', [id]);
         return res.rows[0];
     } catch (error) {
         console.log(error.stack);
     }
 }
-
-async function createNewUserByTID(user) {
+async function createUserByTID(user) {
     try {
-        let res = await connection.query('INSERT INTO users(t_name, t_id) VALUES($1, $2)', [user.username, user['user-id']]);
+        let res = await connection.query('INSERT INTO users(t_name, t_id) VALUES($1, $2) RETURNING id', [user.username, user['user-id']]);
+        await connection.query('INSERT INTO points(user_id) VALUES($1)', [res.rows[0].id]);
         return;
     } catch (error) {
         console.log(error.stack);
@@ -50,7 +46,7 @@ async function addUserPoints(username) {
     return;
 }
 module.exports.getUserByTID = getUserByTID;
-module.exports.createNewUserByTID = createNewUserByTID;
+module.exports.createUserByTID = createUserByTID;
 module.exports.createUserPoints = createUserPoints;
 module.exports.getUserPoints = getUserPoints;
 module.exports.addUserPoints = addUserPoints;
