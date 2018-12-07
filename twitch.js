@@ -23,23 +23,28 @@ client.on('connected', (address, port) => {
 	client.action('awbait', 'Ваш помошник подключился!')
 })
 
-client.on('chat', (channel, user, message, self) => {
-	if (self) return;
+client.on('message', (channel, user, message, self) => {
+	let prefix = '!';
 
-	switch (message) {
-		case '!reg':
+	if (self) return;
+	if (!message.startsWith(prefix)) return undefined;
+
+	let args = message.slice(prefix.length).trim().split(' ');
+
+	switch (args[0].toLowerCase()) {
+		case 'reg':
 			db.getUserByTID(user['user-id']).then((data) => {
-				if(data) {
+				if (data) {
 					say(`${user['display-name']} вы уже зарегестрированы в системе.`);
-				} else { 
+				} else {
 					console.log('Создать пользователя');
-					db.createUserByTID(user).then(() => {
+					db.createUserByTID(user.username, user['user-id']).then(() => {
 						say(`${user['display-name']} вы успешно зарегестрированы в системе.`);
 					})
 				}
 			});
 			break;
-		case '!points':
+		case 'points':
 			let points;
 			db.getUserByTID(user['user-id']).then((data) => {
 				points = data.amount;
@@ -50,6 +55,7 @@ client.on('chat', (channel, user, message, self) => {
 			break;
 	}
 })
+
 
 function say(text) {
 	client.say('awbait', text);
