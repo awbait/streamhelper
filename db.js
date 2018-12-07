@@ -19,9 +19,21 @@ async function getUserByTID(id) {
         console.log(error.stack);
     }
 }
-async function createUserByTID(user) {
+async function getUserByTU(username) {
     try {
-        let res = await connection.query('INSERT INTO users(t_name, t_id) VALUES($1, $2) RETURNING id', [user.username, user['user-id']]);
+        let res = await connection.query('SELECT * FROM users INNER JOIN points ON users.id = points.user_id WHERE users.t_name = $1', [username]);
+        return res.rows[0];
+    } catch (error) {
+        console.log(error.stack);
+    }
+}
+async function addUserPoints(user_id) {
+    await connection.query('UPDATE points SET amount = amount+1 WHERE user_id = $1', [user_id]);
+    return;
+}
+async function createUserByTID(t_name, t_id) {
+    try {
+        let res = await connection.query('INSERT INTO users(t_name, t_id) VALUES($1, $2) RETURNING id', [t_name, t_id]);
         await connection.query('INSERT INTO points(user_id) VALUES($1)', [res.rows[0].id]);
         return;
     } catch (error) {
@@ -29,24 +41,7 @@ async function createUserByTID(user) {
     }
 }
 
-async function createUserPoints(username, points) {
-    try {
-        let res = await connection.query('INSERT INTO points(t_name, points) VALUES($1, $2)', [username, points]);
-        return;
-    } catch (error) {
-        console.log(error.stack);
-    }
-}
-async function getUserPoints(username) {
-    let res = await connection.query('SELECT * FROM points WHERE t_name = $1', [username]);
-    return res.rows[0];
-}
-async function addUserPoints(username) {
-    let res = await connection.query('UPDATE points SET points = points+1 WHERE t_name = $1', [username]);
-    return;
-}
 module.exports.getUserByTID = getUserByTID;
-module.exports.createUserByTID = createUserByTID;
-module.exports.createUserPoints = createUserPoints;
-module.exports.getUserPoints = getUserPoints;
+module.exports.getUserByTU = getUserByTU;
 module.exports.addUserPoints = addUserPoints;
+module.exports.createUserByTID = createUserByTID;
