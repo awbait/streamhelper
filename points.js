@@ -2,6 +2,7 @@ const request = require('request-promise');
 const db = require('./db');
 
 let streamer;
+let blacklist = ['awbait'];
 
 function initPoints(name) {
   streamer = name
@@ -13,7 +14,7 @@ function initPoints(name) {
 function getChatters() {
   let options = {
     method: 'GET',
-    url: `https://tmi.twitch.tv/group/user/${streamer}/chatters`, // указать канал
+    url: `https://tmi.twitch.tv/group/user/${streamer}/chatters`,
     json: true
   };
 
@@ -22,12 +23,13 @@ function getChatters() {
   request(options, function (error, response, body) {
     if (error) throw new Error(error);
 
-    chatters = body.chatters.viewers;
+    chatters = body.chatters.viewers.concat(body.chatters.moderators);
     check(chatters);
   });
 }
 async function check(chatters) {
   for (key in chatters) {
+    if (blacklist.includes(chatters[key])) return;
     await db.getUserByTU(chatters[key]).then(async (data) => {
       if (data) {
         await db.addUserPoints(data.id).then(() => {
@@ -46,7 +48,7 @@ async function check(chatters) {
 
 async function _performGetRequest(url, qs) {
   try {
-    var response = await request({
+    let response = await request({
       url: url,
       method: 'GET',
       headers: {
