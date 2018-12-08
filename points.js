@@ -1,21 +1,47 @@
 const request = require('request-promise');
 const db = require('./db');
 
-let chatters;
+let streamer;
+
+function initPoints(name) {
+  streamer = name
+  setInterval(() => {
+    getChatters();
+  }, 60000);
+}
 
 function getChatters() {
   let options = {
     method: 'GET',
-    url: 'https://tmi.twitch.tv/group/user/exxxe/chatters',
+    url: `https://tmi.twitch.tv/group/user/${streamer}/chatters`, // указать канал
     json: true
   };
+
+  let chatters;
 
   request(options, function (error, response, body) {
     if (error) throw new Error(error);
 
     chatters = body.chatters.viewers;
-    check();
+    check(chatters);
   });
+}
+async function check(chatters) {
+  for (key in chatters) {
+    await db.getUserByTU(chatters[key]).then(async (data) => {
+      if (data) {
+        await db.addUserPoints(data.id).then(() => {
+          console.log(`Данные обновлены ${chatters[key]}`);
+        })
+      } else {
+        let user = await getUsers({
+          login: chatters[key]
+        });
+        await db.createUserByTID(user[0].login, user[0].id);
+        console.log(`Пользователь ${chatters[key]} добавлен.`);
+      }
+    });
+  }
 }
 
 async function _performGetRequest(url, qs) {
@@ -51,24 +77,4 @@ async function getUsers(options) {
   }
 }
 
-setInterval(() => {
-  getChatters();
-}, 60000);
-
-async function check() {
-  for (key in chatters) {
-    await db.getUserByTU(chatters[key]).then(async (data) => {
-      if (data) {
-        await db.addUserPoints(data.id).then(async () => {
-          console.log(`Данные обновлены ${chatters[key]}`);
-        })
-      } else {
-        let user = await getUsers({
-          login: chatters[key]
-        });
-        await db.createUserByTID(user[0].login, user[0].id);
-        console.log(`Пользователь ${chatters[key]} добавлен.`);
-      }
-    });
-  }
-}
+module.exports = initPoints;

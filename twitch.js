@@ -1,6 +1,8 @@
 require('dotenv').config()
 const tmi = require('tmi.js');
 const db = require('./db');
+const points = require('./points');
+points('delaylamy');
 
 let options = {
 	options: {
