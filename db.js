@@ -40,8 +40,9 @@ async function createUserByTID(t_name, t_id) {
         console.log(error.stack);
     }
 }
-
-module.exports.getUserByTID = getUserByTID;
-module.exports.getUserByTU = getUserByTU;
-module.exports.addUserPoints = addUserPoints;
-module.exports.createUserByTID = createUserByTID;
+module.exports = {
+    getUserByTID,
+    getUserByTU,
+    addUserPoints,
+    createUserByTID
+}
