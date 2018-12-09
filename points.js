@@ -1,14 +1,17 @@
 const request = require('request-promise');
 const db = require('./db');
+const live = require('./src/live_stream');
 
 let streamer;
 let blacklist = ['awbait'];
 
 function initPoints(name) {
-  streamer = name
+  streamer = name;
+  live.initLiveStream(streamer);
   setInterval(() => {
+    if (live.status() !== 'on') return;
     getChatters();
-  }, 60000);
+  }, 120000);
 }
 
 function getChatters() {
@@ -25,11 +28,12 @@ function getChatters() {
 
     chatters = body.chatters.viewers.concat(body.chatters.moderators);
     check(chatters);
+    console.log(chatters);
   });
 }
 async function check(chatters) {
   for (key in chatters) {
-    if (blacklist.includes(chatters[key])) return;
+    if (blacklist.includes(chatters[key])) continue;
     await db.getUserByTU(chatters[key]).then(async (data) => {
       if (data) {
         await db.addUserPoints(data.id).then(() => {
