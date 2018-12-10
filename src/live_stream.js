@@ -21,7 +21,7 @@ async function getLiveStatus(streamer) {
         live = 'on';
       }
     } else if (!response.data[0]) {
-      console.log('stream ofline');
+      live = 'off';
     }
   } catch (error) {
     throw error;
@@ -31,11 +31,11 @@ async function getLiveStatus(streamer) {
 function initLiveStream(streamer) {
   setTimeout(() => {
     getLiveStatus(streamer);
-  }, 5000);
+  }, 6000);
 
   setInterval(() => {
     getLiveStatus(streamer);
-  }, 10000);
+  }, 60000);
 }
 
 function status() {

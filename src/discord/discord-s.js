@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const db = require('./db');
+const db = require('../db');
 
 const client = new Discord.Client();
 
@@ -34,9 +34,9 @@ function usersCheckConnection() {
 
 client.on('ready', () => {
   console.log(`DISCORD-S:: Logged in as ${client.user.tag}!`);
-  client.user.setActivity('StreamHelper by awbait', {
+  client.user.setActivity('StreamHelper', {
     url: 'https://twitch.tv/awbait',
-    type: 'STREAMING',
+    type: 'PLAYING',
   });
 
   setInterval(() => {
