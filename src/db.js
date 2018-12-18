@@ -21,6 +21,15 @@ async function getUserByTID(id) {
     return undefined;
   }
 }
+async function getUserByDID(id) {
+  try {
+    const res = await connection.query('SELECT * FROM users INNER JOIN points ON users.id = points.user_id WHERE users.d_id = $1', [id]);
+    return res.rows[0];
+  } catch (error) {
+    console.log(error.stack);
+    return undefined;
+  }
+}
 async function getUserByTU(username) {
   try {
     const res = await connection.query('SELECT * FROM users INNER JOIN points ON users.id = points.user_id WHERE users.t_name = $1', [username]);
@@ -57,6 +66,7 @@ async function updateUserD(id, d_id) {
 }
 module.exports = {
   getUserByTID,
+  getUserByDID,
   getUserByTU,
   addUserPoints,
   createUserByTID,
