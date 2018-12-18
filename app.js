@@ -5,6 +5,7 @@ const discords = require('./src/discord/discord-s');
 const discordr = require('./src/discord/discord-r');
 const twitch = require('./src/twitch');
 const points = require('./src/points');
+const notify = require('./src/notify');
 const WebHook = require('./src/twitch/webhook');
 require('dotenv').config();
 
@@ -46,8 +47,7 @@ function startServer(externalUrl) {
   app.listen(8080, () => console.log('App listening on port '));
 
   webHook.on('streams', (data) => {
-    console.log('Событие сработало.');
-    console.log(data);
+    notify(data);
   });
 
   webHook.topicStreamUpDownSubscribe('38372702');
