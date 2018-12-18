@@ -79,5 +79,4 @@ async function getUsers(options) {
     throw error;
   }
 }
-
 module.exports = initPoints;
