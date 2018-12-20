@@ -6,7 +6,8 @@
         "no-use-before-define": ["error", { "functions": false, "classes": true }],
         "no-underscore-dangle": "off",
         "camelcase": "off",
-        "semi": 2
+        "semi": 2,
+        "class-methods-use-this": "off"
     },
     "parserOptions": {
         "ecmaVersion": 8,
