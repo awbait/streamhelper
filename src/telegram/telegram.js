@@ -8,8 +8,8 @@ const bot = new TelegramBot(token, {
   request: {
     agentClass: Agent,
     agentOptions: {
-      socksHost: '178.128.244.112',
-      socksPort: '1080',
+      socksHost: '178.62.127.186',
+      socksPort: '8444',
       // If authorization is needed:
       // socksUsername: process.env.PROXY_SOCKS5_USERNAME,
       // socksPassword: process.env.PROXY_SOCKS5_PASSWORD
@@ -17,9 +17,10 @@ const bot = new TelegramBot(token, {
   },
 });
 
-function tNotify(data) {
+function streamNotify(data) {
   bot.sendPhoto('-1001385600343', `${data.image}?${new Date()}`, {
-    caption: `${data.userName} сейчас стримит ${data.game} \n${data.title}\n\nЗрителей: ${data.viewerCount}`,
+    caption: `*${data.userName}* запустил стрим!\n${data.title}\n\nИграет в: *${data.game}*\nЗрителей: *${data.viewerCount}*`,
+    parse_mode: 'markdown',
   });
 }
-module.exports = { tNotify };
+module.exports = { streamNotify };

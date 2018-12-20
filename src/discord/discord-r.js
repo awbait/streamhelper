@@ -11,7 +11,7 @@ fs.readdir('./src/discord/commands', (err, files) => {
     if (!file.endsWith('.js')) return;
     console.log(file);
     let props = require(`./commands/${file}`);
-    
+
     console.log(`Загрузка команды ${file}`);
     client.commands.set(props.help.name, props);
   });
@@ -20,6 +20,18 @@ fs.readdir('./src/discord/commands', (err, files) => {
 function initDiscordR() {
   console.log('DISCORD-R:: Module running');
   client.login(process.env.DISCORD_R_TOKEN);
+}
+
+function streamNotify(data) {
+  const guild = client.guilds.get(process.env.DISCORD_GUILD_ID);
+  const channel = guild.channels.find('name', 'test-bot');
+  const notifyEmbed = new Discord.RichEmbed()
+    .setDescription(data.title)
+    .setImage(data.image)
+    .setColor('#4286f4')
+    .addField('Играет в', data.game, true)
+    .addField('Зрителей', data.viewerCount, true);
+  channel.send(`${guild.defaultRole} **${data.userName}** запустил стрим!`, notifyEmbed);
 }
 
 client.on('ready', () => {
@@ -140,4 +152,7 @@ client.on('message', async (message) => {
   // }
 });
 
-module.exports = initDiscordR;
+module.exports = {
+  initDiscordR,
+  streamNotify,
+};

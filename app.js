@@ -25,7 +25,7 @@ ngrok
 twitch();
 points();
 discords();
-discordr();
+discordr.initDiscordR();
 
 function startServer(externalUrl) {
   const webHook = new WebHook({
@@ -40,6 +40,8 @@ function startServer(externalUrl) {
   });
   app.post('/webhook', (req, res) => {
     console.log('SERVER:: Получен POST запрос');
+    console.log(req.body);
+    console.log(req.query);
     const result = webHook.handleRequest('POST', req.headers, req.query, req.body);
     res.sendStatus(result.status);
   });
@@ -47,7 +49,7 @@ function startServer(externalUrl) {
   app.listen(8080, () => console.log('App listening on port '));
 
   webHook.on('streams', (data) => {
-    notify(data);
+    notify(data, discordr);
   });
 
   webHook.topicStreamUpDownSubscribe('38372702');
